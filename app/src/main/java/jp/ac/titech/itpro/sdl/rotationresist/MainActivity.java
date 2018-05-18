@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
+
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
     private final static String TAG = "MainActivity";
 
@@ -51,11 +52,23 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         sensorManager.unregisterListener(this);
     }
 
+    private final static float NS2S = 1.0f / 1000000000.0f;
+    private long timestamp = 0;
+    private double angle = 0;
+
     @Override
     public void onSensorChanged(SensorEvent event) {
-        float omegaZ = event.values[2];  // z-axis angular velocity (radian / sec)
+        //float omegaZ = event.values[2];  // z-axis angular velocity (radian / sec)
         // TODO: calculate right direction that cancels the rotation
-        rotationView.setDirection(omegaZ);
+        //rotationView.setDirection(omegaZ);
+        if (timestamp != 0) {
+            final float dt = (event.timestamp - timestamp) * NS2S;
+            float omegaZ = event.values[2];
+            angle += omegaZ * dt;
+            rotationView.setDirection( angle );
+        }
+        timestamp = event.timestamp;
+
     }
 
     @Override
